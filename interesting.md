@@ -11,7 +11,7 @@ A list of questions/things I'm curious about, that I haven't found a good answer
     - Some people seem to be able to do many more things simultaneously without burning out
     - Some people seem to be able to enter flow states of focus really easily, other can't 
     - Can you do anything about this? Or do we just have to accept that some people are born with "natural adderall brain" and the rest of us are woefully distractible and lazy
-    - I've had some success in changing my own energy levels and focus, but I have friends who just seem pre-wired to sit and work for 7 hours straight with no break. I don't think I'll ever be capable of that without adderall/dangerous amounts of caffeine. 
+    - I've had some success in changing my own energy levels and focus, but I have friends who just seem pre-wired to sit and work for 7 hours straight with no break. 
     - [Hunter vs farmer hypothesis](https://en.wikipedia.org/wiki/Hunter_versus_farmer_hypothesis) is a sort of directionally convincing explanation, but it's only meant to account for the ADHD population when there are significant variations in focus levels even in those without ADHD, and it doesn't explain energy levels well either
 
 - Why is denistry so imprecise compared to other parts of medicine? 
