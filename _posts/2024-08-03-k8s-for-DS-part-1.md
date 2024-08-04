@@ -119,4 +119,8 @@ There are two high-level ways in which a pipeline will fail:
 - pipeline k8s object deployment failures. In which case, the error will be attached to the k8s object where the object occurred, and the tool you need to reach for is probably `k describe pod erroring-pod` 
 - logic failures in your code: in which case, you need to look at the pod logs. `k logs erroring-pod` (note: you don't need to include `pod` in this command, it's implicit)
 
+## Next Steps
 
+If you're interested in more practical k8s tips, as well as the upcoming series on bootstrapping an MLOps system for a small startup, sign up below: 
+
+{% include form.html %}
