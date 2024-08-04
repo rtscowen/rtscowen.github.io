@@ -26,13 +26,13 @@ In industry, you’ll most commonly encounter k8s through a managed k8s service 
 
 There’s **one** key principle, and **three** key concepts, you need to take away to start with. 
 
-**Key principle**: k8s is *declarative*. You declare - usually via config files - what you’d like the state of the cluster to be, then the system works to do what’s necessary to move the cluster to that state. If something goes wrong, k8s acts to bring the world back in alignment with ypur declaration. If you change your declaration, k8s begins the right sequence of object destruction and creation to give life to your wishes with minimum disruption to the cluster. If it fails to do so, it attaches errors to the state of the object where things went wrong. When you’re debugging k8s errors, keep this front of mind. The process is always to ask the cluster to describe the state of the erroneous object, and trace things through from there. If you take this bit of intuition away from this article, and nothing else, you’ll be in a good spot. 
+**Key principle**: k8s is *declarative*. You declare - usually via config files - what you’d like the state of the cluster to be, then the system works to do what’s necessary to move the cluster to that state. If something goes wrong, k8s acts to bring the world back in alignment with your declaration. If you change your declaration, k8s begins the right sequence of object destruction and creation to give life to your wishes with minimum disruption to the cluster. If it fails to do so, it attaches errors to the state of the object where things went wrong. When you’re debugging k8s errors, keep this front of mind. The process is always to ask the cluster to describe the state of the erroneous object, and trace things through from there. If you take this bit of intuition away from this article, and nothing else, you’ll be in a good spot. 
 
 **Key concept 1**: *Nodes*. Nodes are the underlying compute for the cluster. If your company is using a managed k8s service, the nodes will probably be instances of the cloud provider’s compute service (AWS EC2 instances for example).
 
-**Key concept 2**: *Pods*. Pods are k8’s most fundamental abstraction. Many of the other abstractions (like Deployments) are combinations of pods and other k8s objects, under the hood. A pod is one or more containers, allocated a shared files system and networking interface. Everything needed to run a unit of meaningful computational work. The only thing missing is the compute itself, which is what nodes provide. In this way, k8s achieves separation of the compute layer and the application layer. 
+**Key concept 2**: *Pods*. Pods are k8’s most fundamental abstraction. Many of the other abstractions (like Deployments) are combinations of pods and other k8s objects. A pod is one or more containers, allocated a shared files system and networking interface. Everything needed to run a unit of meaningful computational work. The only thing missing is the compute itself, which is what nodes provide. In this way, k8s achieves separation of the compute layer and the application layer. 
 
-**Key concept 3**: *Scheduling*. k8s ships with a default scheduler, and the scheduler's job is to distribute pods among nodes according to their resources. Since it’s a containerised system, nodes can accept as many pods as their computational resources allow. CPU and memory are the key resource types. For ML work, you’ll usually have a group of nodes with GPUs as well. You can give the scheduler hints and constraints for how you’d like it to distribute pods among nodes. k8s has a very unituitively named push/pull pair of systems called ‘taints and tolerations’ and 'affinity and anti-affinity' for accomplishing all of this, which we won’t get into here. An ML example: for distributed training, we usually want pods to be as co-located as possible to minimise the amount of time they spend communicating with each other over the network. And we want to avoid any nodes without GPUs. We setup the taints and tolerations and affinity interplay between nodes and pods such that this occures.
+**Key concept 3**: *Scheduling*. k8s ships with a default scheduler, and the scheduler's job is to distribute pods among nodes according to their resources. Since it’s a containerised system, nodes can accept as many pods as their computational resources allow. CPU and memory are the key resource types. For ML work, you’ll usually have a group of nodes with GPUs as well. You can give the scheduler hints and constraints for how you’d like it to distribute pods among nodes. k8s has a very unituitively named push/pull pair of systems called ‘taints and tolerations’ and 'affinity and anti-affinity' for accomplishing all of this, which we won’t get into here. An ML example: for distributed training, we usually want pods to be as co-located as possible to minimise the amount of time they spend communicating with each other over the network. And we want to avoid any nodes without GPUs. We setup the taints and tolerations and affinity interplay between nodes and pods such that this occurs.
 
 The key takeaway: k8s expects you to declare the state of your cluster, and it works to bring/keep the cluster in alignment with that state as much as possible, scheduling pods to nodes as capacity permits. Many pods run on a single node.
 
@@ -40,7 +40,7 @@ The key takeaway: k8s expects you to declare the state of your cluster, and it w
 
 **For this article, we’ve assumed the existence of a k8s cluster already, and that you've followed internal documentation necessary to be able to connect to that cluster. If you're not at this point, there are cloud provider specific resources to get you there. I'll also write a future post covering cluster admin as part of an upcoming article on bootstrapping barebones MLOps in small teams. But for now, that's too much detail for a primer. Subscribe to the mailing list if you're interested.**
 
-All of your interaction with k8s takes place via a command line tool called *kubectl*. It’s pronounced ‘cube control’ (no, really, that’s [officially](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.9.md#kubectl) how you say it). Commands are loosely of the form ‘kubectl *verb* *noun* *identifier*’. Components in the cluster listen out for these commands and bring your wishes to life (assuming you have the right permissions: if you hit permission errors, you need to talk to your cluster admins)
+All of your interaction with k8s takes place via a command line tool called *kubectl*. It’s pronounced ‘cube control’ (that’s [officially](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.9.md#kubectl) how you say it). Commands are loosely of the form ‘kubectl *verb* *noun* *identifier*’. Components in the cluster listen out for these commands and bring your wishes to life (assuming you have the right permissions: if you hit permission errors, you need to talk to your cluster admins)
 
 [Install](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/) *kubectl* with `brew install kubectl`
 
@@ -68,6 +68,8 @@ So far, we’ve setup the tools we need to interact with an existing k8s cluster
 
 # Exploring Cluster Resources
 
+We're going to introduce two of the most important k8s verb commands you'll learn, `get` and `describe`. Get is useful for a bird's eye summary. Describe is for when you want more details, and is particularly useful for debugging (in combination with the `events` command and `logs`).
+
 ## Namespaces
 
 In industry, a typical setup from your platform team would be that you have a namespace created for your team, with all of your team’s resources residing in that namespace. Namespaces provide an isolation mechanism, with the names of resources being unique within a namespace. This way, ML-team-1 and ML-team-2 can both have resources named **perform-feature-making-incantations-from-BI-pipeline-output** without worrying about clashes.
@@ -84,13 +86,37 @@ To see all the available namespaces on the cluster, `k get namespaces`.
 
 ## Pods
 
+Pods are a namespaced resource (if a namespace isn't specified when a pod is created, it will reside in the default namespace). We need to direct kns to select the right namespce for your team, If you're in team `opaque-codename`, for instance, and your platform team have created that namespace for you, run `kns opaque-codename` to ensure that all future commands apply to that namespace. Otherwise, you'd have to add `-n opaque-namespace` to your command. 
+
+Using the alias we defined earlier, run `kgp` (we defined `kgp` as `kubectl get pods`). You'll see a tabulated list of pods returned. A typical ML pipeline deployed on a k8s cluster, involves (at least) one pod per step of the pipeline. Each pod in the list will have an attached status field. 
+
+Just like with nodes, you can get information on a particular pod: `k get pod pod-name-xyfyh`
+
+If you see an error in the status field, you can get more detailed infromation by describing that pod `k describe pod pod-name-xyfyh` and looking at the event log towards the bottom of the output. 
+
 ## Secrets
 
-# The Key Command Set
+Secrets are another really common resource type. Often, you'll have API keys that you need available to pods. Typically, these will be environmental variables when the pod runs. However, in order to populate these environmental variables in the first place, we need a way of storing the secrets securely in the cluster itself. If you're debugging a pipeline, and you're getting API key errors, improper secrets might be the source of the problem. Explore your namespace's secrets like so: 
 
-**Get to inspect**
+### Listing secrets
 
-**Describe to debug**
+`k get secrets` -> tabulated summary of all secrets
 
+`k get secret secret-name` -> summary of individual secret
+
+## External Resources and Operators
+
+k8s is very extensible. Pods, StatefulSets, ReplicaSets, Deployments, are some of the built in resource types. It allows for Custom Resource Definitions (CRD). A really common CRD you'll encounter in industry is External Secrets Operator. This takes care of syncing a secret from a cloud provider's secret store (AWS SecretsManager, for instance), with a k8s secret. If you update the secret in SecretsManager, ESO syncs the update with the corresponding k8s secret. This is particularly useful for sensitive secrets, that are rotated often. 
+
+k8s lets you use all your usual verbs with external resources: 
+
+`k get externalsecrets` -> view the external secrets in your namespace. 
+
+## Debugging Strategy
+
+There are two high-level ways in which a pipeline will fail: 
+
+- pipeline k8s object deployment failures. In which case, the error will be attached to the k8s object where the object occurred, and the tool you need to reach for is probably `k describe pod erroring-pod` 
+- logic failures in your code: in which case, you need to look at the pod logs. `k logs erroring-pod` (note: you don't need to include `pod` in this command, it's implicit)
 
 
