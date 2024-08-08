@@ -4,7 +4,8 @@ title: A Kubernetes Primer for Data Science and ML Backgrounds - part 1 - Backgr
 author: rob
 ---
 
-At some point in your career, you’ll encounter Kubernetes. This is a primer on Kubernetes for people with data science or ML research backgrounds. I started my career as a software engineer, pivoted to ML engineering, and am now hooked on MLOps. One thing I’ve always admired about DS and ML colleagues is the willingness to pick up engineering tasks to get the job done. Based on that, I thought there might be an appetite for a Kubernetes primer for people with an ML background, one that’s practical but runs through enough of the theoretical groundwork to build the right intuition. 
+At some point in your career, you’ll encounter Kubernetes. This is a primer on Kubernetes for people with data science or ML research backgrounds. I started my career as a software engineer, pivoted to ML engineering, and am now hooked on MLOps. One thing I’ve always admired about DS and ML colleagues is the willingness to pick up engineering tasks to get the job done. Based on that, I thought there might be an appetite for a Kubernetes primer for people with an ML background, one that’s practical but runs through enough of the theoretical groundwork to build the right intuition.
+
 
 You might have found yourself with failing pipelines that you want to debug without raising a support request. If so, this series of articles will teach you the crucial subset of Kubernetes commands you need to get to the bottom of an issue. You might even be co-founding a startup shouldering the MLOps work yourself (in which case, get started with Kubernetes in this post and then subscribe below for a follow up series on bootstrapping a barebones MLOps setup for a small-scale experimentation driven workflow). 
 
@@ -26,7 +27,7 @@ At a high level, k8s solves the problem of assigning computational work packaged
 
 *Author’s MLOps aside: I think the future of ML Ops moves us away from k8s, but we’re not there yet. It’s not really great for the bursty nature of ML work, and when you get into distributed training, you end up installing a bunch of extra things on the cluster to ensure the scheduler behaves. Some of these don’t play nicely with cluster autoscaler. I think we’ll end up evolving in a direction of: better IR-based serialisation and containerisation for models (and associated pre/post processing), combined with better distributed compute primitives designed specifically for the challenges of ML work. k8s isn’t going anywhere for a while though.*
 
-In industry, you’ll most commonly encounter k8s through a managed k8s service (AWS EKS, or GCP GKE, or Azure AKS. IBM - yes, they have a cloud, I didn’t know this either until I worked there - EKS if you’re working somewhere really odd). 
+In industry, you’ll most commonly encounter k8s through a managed k8s service (AWS EKS, or GCP GKE, or Azure AKS). 
 
 # One Key Principle, Three Key Concepts 
 
