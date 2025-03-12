@@ -14,4 +14,4 @@ CLI app for habit tracking, written when I was learning Golang, inspired by Atom
 
 # [Applying Gaussian Process Regression to ALS patients](https://github.com/rtscowen/ALS-Clusters)
 
-My undergrad diss on using Gaussian Process regression to find subgroups of ALS patients. 
+My undergrad diss on using Gaussian Process regression to find subgroups of ALS patients. replicated some literature clusters on a subset of patients using Gaussian Process Regression. 
