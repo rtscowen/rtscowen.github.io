@@ -21,7 +21,7 @@
 title: Rob Scowen
 email: rtscowen@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Positioning for something new. EV Grant Winner 2025. Entrepreneurship, MLOps, curiosities
+  Positioning for something new. MLOps, curiosities, company building
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: rtsdfdx
